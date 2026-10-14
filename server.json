@@ -1,0 +1,26 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.realtycrawl/realtycrawl",
+  "title": "RealtyCrawl",
+  "description": "Search source-linked real estate observations with capability discovery and bounded credits.",
+  "version": "1.0.0",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://realtycrawl.dev/mcp",
+      "headers": [
+        {
+          "name": "Authorization",
+          "description": "Bearer YOUR_API_KEY. Get a RealtyCrawl key from the dashboard.",
+          "isRequired": true,
+          "isSecret": true
+        }
+      ]
+    }
+  ],
+  "repository": {
+    "url": "https://github.com/realtycrawl/realtycrawl-mcp",
+    "source": "github"
+  },
+  "websiteUrl": "https://realtycrawl.dev"
+}
