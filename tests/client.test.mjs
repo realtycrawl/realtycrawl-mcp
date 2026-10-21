@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {RealtyCrawlClient} from '../src/client.mjs';
 const envelope={data:[{id:'obs_example'}],meta:{request_id:'fixture',completeness:'partial'}};
-const spec={components:{schemas:{}},paths:{'/v1/{platform}/listings/search':{post:{operationId:'searchPlatformListings',tags:['platform-listings']}},'/v1/meta/platforms':{get:{operationId:'listPlatforms',tags:['meta']}}}};
+const spec={components:{schemas:{}},paths:{'/v1/{platform}/listings/search':{post:{operationId:'searchPlatformListings',tags:['platform-listings'],'x-runtime-status':'beta','x-credit-cost':50,'x-credit-unit':'successful_source_crawl'}},'/v1/meta/platforms':{get:{operationId:'listPlatforms',tags:['meta']}}}};
 test('constructs a budgeted source request and preserves provenance metadata',async()=>{
  let captured;const client=new RealtyCrawlClient({apiKey:'test-only-key',fetchImpl:async(url,init)=>{if(url.pathname.endsWith('openapi.json'))return Response.json(spec);captured={url,init};return Response.json(envelope);}});
  const body={platform:'zillow',location:{kind:'bbox',bbox:[-97.82,30.2,-97.65,30.35]},transaction:'sale',limit:1};
@@ -36,4 +36,10 @@ test('surfaces request IDs and rejects malformed responses',async()=>{
  await assert.rejects(bad.get('/v1/listings/one'),/req_example/);
  const malformed=new RealtyCrawlClient({fetchImpl:async()=>Response.json({data:[]})});
  await assert.rejects(malformed.platforms(),/contract/);
+});
+
+test('discovery preserves runtime status and charging units without executing a source call',async()=>{
+ let calls=0;const client=new RealtyCrawlClient({apiKey:'test-only',fetchImpl:async(url,init)=>{calls++;assert.equal(url.pathname,'/v1/openapi.json');assert.equal(init.headers.Authorization,undefined);return Response.json(spec);}});
+ const op=await client.endpoint('searchPlatformListings');
+ assert.equal(op.runtimeStatus,'beta');assert.equal(op.creditCost,50);assert.equal(op.creditUnit,'successful_source_crawl');assert.equal(calls,1);
 });
