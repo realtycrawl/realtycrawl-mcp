@@ -68,3 +68,7 @@ Discover `getListingEnergy`, `getListingRisk`, `getStayDetails`, `getMarketSumma
 Use POST /v1/{platform}/listings/batch with items containing canonical URLs or supported native IDs (1–5), retaining existing selector requirements. Reserve 50 credits per item and charge only successful details. The existing Zillow native_ids batch contract is unchanged. Use POST /v1/observations/batch with resources containing a public read operation and returned ID (1–25); reserve 1 credit per item and charge only successful saved reads. Missing or expired observations remain per-item failures. No automatic retries or retention extension.
 
 StreetEasy supplies school observations and Rightmove supplies embedded brokerage attribution where present. Tax history and nearby-home sections remain source-specific. FHFA state-market definitions can be read with GET /v1/markets/{market_id}.
+
+## Billing and credits
+
+Paid plans provide monthly credits: Starter $15 for 2,500, Growth $49 for 20,000, and Pro $299 for 150,000. Monthly credits expire at period end without rollover or automatic overage charges. Eligible accounts receive 500 signup credits once. Existing balances remain nonexpiring and usable without subscribing; requests spend monthly credits first. Manage billing in the [dashboard](https://realtycrawl.dev/dashboard/payments) and read the [billing guide](https://realtycrawl.dev/docs/billing). Operation costs, request budgets, and idempotency rules remain unchanged.
