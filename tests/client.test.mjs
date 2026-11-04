@@ -43,3 +43,20 @@ test('discovery preserves runtime status and charging units without executing a 
  const op=await client.endpoint('searchPlatformListings');
  assert.equal(op.runtimeStatus,'beta');assert.equal(op.creditCost,50);assert.equal(op.creditUnit,'successful_source_crawl');assert.equal(calls,1);
 });
+
+
+for(const format of ['csv','ndjson'])test(format+' export keeps response controls in the URL and returns text with billing metadata',async()=>{
+ let captured;
+ const content=format==='csv'?'id\r\none\r\n':'{"id":"one"}\n';
+ const client=new RealtyCrawlClient({apiKey:'test-only',fetchImpl:async(url,init)=>{
+  if(url.pathname.endsWith('openapi.json'))return Response.json(spec);
+  captured={url,init};return new Response(content,{headers:{'content-type':format==='csv'?'text/csv':'application/x-ndjson','x-request-id':'export-request','x-credits-used':'3','x-row-count':'1'}});
+ }});
+ const result=await client.callEndpoint({endpointId:'searchPlatformListings',parameters:{platform:'zillow',limit:1,fields:'id',format},maxCredits:3,idempotencyKey:'same-export'});
+ assert.equal(captured.url.searchParams.get('fields'),'id');assert.equal(captured.url.searchParams.get('format'),format);assert.deepEqual(JSON.parse(captured.init.body),{limit:1});
+ assert.equal(result.format,format);assert.equal(result.content,content);assert.equal(result.meta.request_id,'export-request');assert.equal(result.meta.credits_used,3);assert.equal(result.meta.row_count,1);
+});
+test('export requests preserve structured JSON errors',async()=>{
+ const client=new RealtyCrawlClient({apiKey:'test-only',fetchImpl:async()=>Response.json({error:{code:'SOURCE_UNAVAILABLE',message:'Unavailable'},request_id:'export-error'},{status:503})});
+ await assert.rejects(client.get('/v1/listings/one',{format:'csv'},{maxCredits:1}),/SOURCE_UNAVAILABLE: Unavailable.*export-error/);
+});
