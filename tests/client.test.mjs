@@ -3,6 +3,11 @@ import assert from 'node:assert/strict';
 import {RealtyCrawlClient} from '../src/client.mjs';
 const envelope={data:[{id:'obs_example'}],meta:{request_id:'fixture',completeness:'partial'}};
 const spec={components:{schemas:{}},paths:{'/v1/{platform}/listings/search':{post:{operationId:'searchPlatformListings',tags:['platform-listings'],'x-runtime-status':'beta','x-credit-cost':50,'x-credit-unit':'successful_source_crawl'}},'/v1/meta/platforms':{get:{operationId:'listPlatforms',tags:['meta']}}}};
+test('endpoint discovery preserves documented source associations and separates them from verified coverage',async()=>{
+ let calls=0;const contract={components:{schemas:{}},paths:{'/v1/listings/{listing_id}/lease-terms':{get:{operationId:'getListingLeaseTerms',tags:['listings'],summary:'Commercial lease terms',description:'Read retained advertisement observations.','x-runtime-status':'beta','x-documented-platforms':['commercialcafe'],'x-verified-platforms':[],'x-evidence-level':'provider_documentation_and_offline_tests','x-data-freshness':'retained','x-credit-cost':1,'x-credit-unit':'successful_retained_read'}}}};
+ const client=new RealtyCrawlClient({fetchImpl:async(url,init)=>{calls++;assert.equal(url.pathname,'/v1/openapi.json');assert.equal(init.headers.Authorization,undefined);return Response.json(contract);}}),op=await client.endpoint('getListingLeaseTerms');
+ assert.deepEqual(op.documentedPlatforms,['commercialcafe']);assert.deepEqual(op.verifiedPlatforms,[]);assert.equal(op.evidenceLevel,'provider_documentation_and_offline_tests');assert.equal(op.dataFreshness,'retained');assert.equal(op.description,'Read retained advertisement observations.');assert.equal(op.creditCost,1);assert.equal(calls,1);
+});
 test('constructs a budgeted source request and preserves provenance metadata',async()=>{
  let captured;const client=new RealtyCrawlClient({apiKey:'test-only-key',fetchImpl:async(url,init)=>{if(url.pathname.endsWith('openapi.json'))return Response.json(spec);captured={url,init};return Response.json(envelope);}});
  const body={platform:'zillow',location:{kind:'bbox',bbox:[-97.82,30.2,-97.65,30.35]},transaction:'sale',limit:1};

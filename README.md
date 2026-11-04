@@ -2,6 +2,8 @@
 
 A Model Context Protocol server for source-linked real estate observations. The public contract includes research and unavailable operations: check capabilities before execution.
 
+Endpoint discovery preserves documented and verified source associations, evidence level, freshness and charging units separately. Retained commercial lease terms and rental layout ranges describe advertisements; their unit inventory and availability remain unverified. Fresh source details require their declared beta enablement and selectors.
+
 ## Hosted server
 
 Use Streamable HTTP at `https://realtycrawl.dev/mcp`, with `Authorization: Bearer YOUR_API_KEY`. Store the actual key in your client's protected settings.
@@ -59,7 +61,9 @@ Zillow listing searches cost 3 credits per returned listing (default limit 10); 
 
 ## Cross-platform workflows
 
-The contract supports retained property facts for 183 listing sources, source-detail batches for 31 additional platforms, and saved-observation batches across all 196 in-scope sources. Source availability remains operation-specific; new bindings are documentation/offline-test backed.
+The contract documents source-specific listing and stay filters, exact source-detail selectors, typed retained energy/flood/planning context, and saved-observation batches across the 196 in-scope sources. Fresh listing and stay detail beta requires explicit operator enablement. New bindings have documentation and offline-test evidence; check live capabilities before executing.
+
+Discover `getListingEnergy`, `getListingRisk`, `getStayDetails`, `getMarketSummary` and `getPropertyZoning` through the same metadata tools before calling them. Retained sections cost one credit; supported fresh stay detail and FHFA index-growth summaries cost 50 credits on success. Source observations do not establish certification, legal entitlement or a bookable room.
 
 Use POST /v1/{platform}/listings/batch with items containing canonical URLs or supported native IDs (1–5), retaining existing selector requirements. Reserve 50 credits per item and charge only successful details. The existing Zillow native_ids batch contract is unchanged. Use POST /v1/observations/batch with resources containing a public read operation and returned ID (1–25); reserve 1 credit per item and charge only successful saved reads. Missing or expired observations remain per-item failures. No automatic retries or retention extension.
 
