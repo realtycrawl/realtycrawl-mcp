@@ -56,3 +56,11 @@ Offline tests exercise the MCP protocol and mocked API requests. Live verificati
 ## Release compatibility
 
 Zillow listing searches cost 3 credits per returned listing (default limit 10); other source crawls cost 50 credits per successful platform; stored-observation reads cost 1 credit. Metadata and idempotent replays are free. `X-Max-Credits` is a maximum budget, not a charge; inspect the live operation contract and `X-Credits-Used` before quoting costs. Check platform-operation capabilities separately: documentation-backed beta coverage is callable but has not received fresh live source acceptance. Preserve its warnings.
+
+## Cross-platform workflows
+
+The contract supports retained property facts for 183 listing sources, source-detail batches for 31 additional platforms, and saved-observation batches across all 196 in-scope sources. Source availability remains operation-specific; new bindings are documentation/offline-test backed.
+
+Use POST /v1/{platform}/listings/batch with items containing canonical URLs or supported native IDs (1–5), retaining existing selector requirements. Reserve 50 credits per item and charge only successful details. The existing Zillow native_ids batch contract is unchanged. Use POST /v1/observations/batch with resources containing a public read operation and returned ID (1–25); reserve 1 credit per item and charge only successful saved reads. Missing or expired observations remain per-item failures. No automatic retries or retention extension.
+
+StreetEasy supplies school observations and Rightmove supplies embedded brokerage attribution where present. Tax history and nearby-home sections remain source-specific. FHFA state-market definitions can be read with GET /v1/markets/{market_id}.
